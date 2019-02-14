@@ -1,0 +1,7 @@
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\obj\Debug\Task 2.csproj.CoreCompileInputs.cache
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\bin\Debug\Task 2.exe.config
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\bin\Debug\Task 2.exe
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\bin\Debug\Task 2.pdb
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\obj\Debug\Task 2.exe
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\obj\Debug\Task 2.pdb
+C:\Users\Faizullayev Rauan\Desktop\PP2\Lab 1\Task 2\Task 2\obj\Debug\Task 2.csprojAssemblyReference.cache
