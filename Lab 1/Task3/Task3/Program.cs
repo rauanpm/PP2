@@ -8,21 +8,21 @@ namespace Task3
 {
     class Program
     {
+        static void Dmassive(int arr3[])
+        {
+            int cnt = 0;
+            int[] arrx = new int[arr.length * 2];
+            arrx[cnt++] == arr[i];
+            arrx[cnt++] == arr[i];
+        }
         static void Main(string[] args)
         {
             int n = Convert.ToInt32(Console.ReadLine());
-            int[] arr = Array.ConvertAll<string, int>(Console.ReadLine().Split(), int.Parse);
-            int[] arr2 = new int[n * 2];
-            int cnt = 0;
-            for(int i = 0; i < arr.Length; ++i)
+            int[] arr2 = Array.ConvertAll<string, int>(Console.ReadLine().Split(), int.Parse);
+            int[] show = Dmassive(arr2);
+            for(int i = 0; i < show.Length; ++i)
             {
-                arr2[cnt++] = arr[i];
-                arr2[cnt++] = arr[i];
-            }
-            for(int i = 0; i < arr2.Length; ++i)
-            {
-                Console.WriteLine(arr2[i]);
-                
+                Console.WriteLine(show[i] + " ");
             }
             Console.ReadKey();
 
