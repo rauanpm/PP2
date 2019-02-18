@@ -1,201 +1,174 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
-namespace FarManager
+namespace Task1
 {
-    class Screen
-    { // Класс, выводящий все папки и файлы
-        public static string Path { get; set; }
+    class FarManager
+    {
+        DirectoryInfo dir = null;
+        public int cursor;
+        public string path;
+        public int size;
+        FileSystemInfo f1 = null;
 
-        public FileSystemInfo[] Content { get; set; }
-
-        int _curr;
-        public int CurrentItem
-        { // Индекс выбранной папки или файла 
-            get
+        public FarManager(string path) // Конструктор который получает путь и записывает его в исходный путь
+        {
+            this.path = path;
+            cursor = 0;
+        }
+        public void Color(FileSystemInfo f, int index) // Метод для обозначения разных типов данных разными цветами
+        {
+            if (cursor == index) // Меняет цвет места где находится курсор
             {
-                return _curr;
+                Console.BackgroundColor = ConsoleColor.Magenta;
+                Console.ForegroundColor = ConsoleColor.White;
+                f1 = f; // Присваеваемзначение чтобы мы могли использовать переменную f1
             }
-            set
+            else if (f.GetType() == typeof(DirectoryInfo)) // Цвет для Папки
             {
-                if (value >= 0 && value < Content.Length)
-                { // Ограничения для выбранного файла: индекс >= 0 и < количества элементов
-                    _curr = value;
-                }
-                else if (value >= Content.Length)
-                {
-                    _curr = Content.Length - 1;
-                }
-                else
-                {
-                    _curr = 0;
-                }
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else // Цвета для остальных
+            {
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Yellow;
             }
         }
+        public void Show() // Метод вписывающий нашу папку
+        {
 
-        public enum FMode
-        { // Мод для открытия, удаления, переименовывания
-            Directory, // Мод для папки
-            File //Файл
-        }
-
-        public FMode Mode { get; set; }
-
-        public Screen(string path)
-        { // Конструктор принимает строку - путь до папки, элементы которой нужно отобразить
-            Path = path;
-            DirectoryInfo dir = new DirectoryInfo(Path);
-            Content = dir.GetFileSystemInfos();
-            CurrentItem = 0; // Устанавливает выбранный элемент на 0й
-            Mode = FMode.Directory; // По умолчанию FMode = Directory
-        }
-
-        public void Display()
-        { // Вывод в консоль всех папок и файлов
-            Console.Clear(); // Очистка консоли от предыдущих папок и файлов
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine("Arrow Up - next | Arrow down - previous | Enter - Open | Backspace - Back | R - Rename | Esc - Exit"); // Вывести команды в консоль
-            Mode = FMode.Directory;
-            for (int i = 0; i < Content.Length; i++)
+            dir = new DirectoryInfo(path); // Назначает путь
+            FileSystemInfo[] FSI = dir.GetFileSystemInfos(); // Записывает всю информацию про папки и файлы в массив
+            Console.BackgroundColor = ConsoleColor.Black;//Постоянно меняет цвет нашего фона
+            Console.Clear();
+            for (int i = 0, j = 0; i < FSI.Length; i++) // Цикл показывающий всё что есть в папке
             {
-                if (i == CurrentItem)
+                if (FSI[i].Name[0] == '.') // Не показывать скрытые файлы
+                    continue;
+                Color(FSI[i], j); // Вызывает функцию которая перекрашывает наши папки и файлы
+                Console.WriteLine(j + 1 + ". " + FSI[i].Name); // Нумерует и показывает файлы и папки
+                j++;
+            }
+
+        }
+        public void HiddenFiles() // Метод вычисляющий скрытые файлы
+        {
+            DirectoryInfo d = new DirectoryInfo(path); // Посылает путь
+            FileSystemInfo[] fi = d.GetFileSystemInfos(); // Создаёт массив из папок и файлов
+            size = fi.Length; // размер равен всем элементам 
+            for (int i = 0; i < fi.Length; i++) // Цикл для нахождения скрытых файлов
+            {
+                if (fi[i].Name[0] == '.') // Уменьшаем размер если мы находим скрытые файлы
+                    size--;
+            }
+        }
+        public void Down() // Метод для перехода вниз
+        {
+            cursor++;
+            if (cursor == size) // 
+                cursor = 0;
+        }
+        public void Up()//Метод для перехода вверх
+        {
+            cursor--;
+            if (cursor < 0) // 
+                cursor = size - 1;
+        }
+        public void Start() //Главная функция
+        {
+
+            ConsoleKeyInfo Cons;
+            bool Ok = true; // Булеаная из-за которой наша консоль остаётся открытой
+            while (Ok == true) //Цикл зависящий от булеаной
+            {
+                HiddenFiles(); // Размер без скрытых файлов
+                Show(); // Показывает все элементы в массиве 
+                Cons = Console.ReadKey(); //Кнопка с определёнными биндами
+                if (Cons.Key == ConsoleKey.DownArrow) // Вызов метода Down нажатием клавишей вниз
                 {
-                    Console.ForegroundColor = ConsoleColor.Green; // Если текущий индекс соответствует выбранному, то выделить цветом
+                    Down();
                 }
-                else
+                else if (Cons.Key == ConsoleKey.Q) // Выход из консоли нажатием Q
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
+                    Ok = false;
                 }
-                Console.WriteLine(i + 1 + ". " + Content[i].Name);
+                else if (Cons.Key == ConsoleKey.UpArrow) // Вызов метода Up нажатием клавишы вверх
+                {
+                    Up();
+                }
+                else if (Cons.Key == ConsoleKey.Enter) // Открываем папку или файл нажатием ENTER
+                {
+                    if (f1.GetType() == typeof(DirectoryInfo)) // Проверка типа файла
+                    {
+                        cursor = 0;
+                        path = f1.FullName; // Путь приравнивается пути этой папки
+                    }
+                    else
+                    {
+                        StreamReader SR = new StreamReader(f1.FullName);
+                        Console.WriteLine(SR.ReadToEnd());// Показвает все что есть в файле
+                        SR.Close();
+                        Console.ReadKey();
+                        Console.Clear();
+
+                    }
+                }
+                else if (Cons.Key == ConsoleKey.Escape) // Идём назад если нажимется клавиша Escape
+                {
+                    if (dir.Parent.FullName != @"C:\") //Ограничение до диска C
+                    {
+                        path = dir.Parent.FullName;//Обновляет наш путь
+                        cursor = 0;
+                    }
+                    else
+                    {
+                        Console.Clear();
+                        Console.WriteLine("You Can't go out from the disk"); // Если дошёл до диска С и нажмаешь Escape
+                    }
+                }
+                else if (Cons.Key == ConsoleKey.Backspace) //Удаление
+                {
+                    if (f1.GetType() == typeof(DirectoryInfo))
+                    {
+                        cursor = 0;
+                        Directory.Delete(f1.FullName, true);
+                    }
+                    else
+                    {
+                        cursor = 0;
+                        File.Delete(f1.FullName);
+                    }
+                }
+                else if (Cons.Key == ConsoleKey.Tab) // Переминеование
+                {
+                    Console.Clear();
+                    string name = Console.ReadLine(); // Новое имя
+                    Console.Clear();
+                    string copPath = Path.Combine(dir.FullName, name); //Создаём путь 
+                    if (f1.GetType() == typeof(DirectoryInfo))
+                    {
+                        Directory.Move(f1.FullName, copPath);
+                    }
+                    else
+                    {
+                        File.Move(f1.FullName, copPath);
+                    }
+                }
             }
         }
     }
-
     class Program
     {
-        static void OpenItem(FileSystemInfo item, Stack<Screen> screens)
-        { // Функция, отвечающая за открытие папок и файлов 
-            if (item.GetType() == typeof(DirectoryInfo))
-            { // Если открыли папку, то применить методы для DirectoryInfo
-                screens.Push(new Screen(item.FullName)); // Добавляем в историю открытую папку
-                screens.Peek().Display();
-            }
-            else
-            {
-                FileInfo file = new FileInfo(item.FullName);
-                screens.Peek().Mode = Screen.FMode.File; // Если открыт был файл - изменить Mode на File
-                Console.Clear();
-                Console.WriteLine("Arrow Up - next | Arrow down - previous | Enter - Open | Backspace - Back | R - Rename | Esc - Exit");
-                using (FileStream fs = file.Open(FileMode.Open, FileAccess.ReadWrite))
-                { // Чтение содержимого открытого файла
-                    byte[] rawText = new byte[fs.Length]; // Использован FileStream и его методы для вывода.
-                    fs.Read(rawText, 0, rawText.Length);
-                    string text = Encoding.Default.GetString(rawText);
-                    Console.Write(text);
-                }
-            }
-        }
-
-        static void BackTo(Stack<Screen> history)
-        { // Функция реализующая назад в историю
-            if (history.Peek().Mode == Screen.FMode.Directory)
-            { // Если открыта папка, то удалить текущую папку из истории и открыть предыдущую
-                history.Pop();
-                history.Peek().Display();
-            }
-            else
-            {
-                history.Peek().Display(); // Если файл, то открыть родительскую папку
-            }
-        }
-
-        static void DeleteItem(FileSystemInfo item, Stack<Screen> screens)
-        { // Реализция удаления папки
-            if (item.GetType() == typeof(DirectoryInfo))
-            { // Если папка, то использовать методы для DirectoryInfo
-                DirectoryInfo dir = new DirectoryInfo(item.FullName);
-                dir.Delete(true); // Удалить папку
-                screens.Pop(); // Обновить папку в истории(удалить предыдущую запись из истории и вставить новую)
-                screens.Push(new Screen(dir.Parent.FullName) { CurrentItem = screens.Count > 0 ? screens.Peek().CurrentItem-- : 0 });
-            }
-            else
-            {
-                FileInfo file = new FileInfo(item.FullName);
-                file.Delete(); // Удалить файл
-                screens.Pop(); // Обновить файл в истории(удалить предыдущу запись из истории и вставить новую)
-                screens.Push(new Screen(file.DirectoryName));
-            }
-            screens.Peek().Display();
-        }
-
-        static void RenameItem(FileSystemInfo item, Stack<Screen> screens)
-        { // Реализация переименовывания
-            Console.Clear();
-            Console.WriteLine("Write new name (Just name, not a path)");
-            string newName = Console.ReadLine(); // ввод нового имени
-            if (item.GetType() == typeof(DirectoryInfo))
-            {
-                DirectoryInfo dir = new DirectoryInfo(item.FullName);
-                newName = newName.Insert(0, dir.Parent.FullName + "\\"); // Добавить абсолютный путь к введенному имени
-                dir.MoveTo(newName); // Переименовывание реализовано как перемещение папки, изменяя имя
-                screens.Pop(); // Обновление файла
-                screens.Push(new Screen(dir.Parent.FullName)); // Обновление файла
-            }
-            else
-            {
-                FileInfo file = new FileInfo(item.FullName);
-                newName = newName.Insert(0, file.DirectoryName + "\\"); // Добавить абсолютный путь к введенному имени
-                file.MoveTo(newName);
-                screens.Pop(); // Обновление файла
-                screens.Push(new Screen(file.DirectoryName)); // Обновление файла
-            }
-            screens.Peek().Display();
-        }
-
         static void Main(string[] args)
         {
-            Stack<Screen> screens = new Stack<Screen>();
-            screens.Push(new Screen(@"C:\Users\Faizullayev Rauan\Desktop")); // Создание первого экрана(вывод всех папок и файлов)
-            screens.Peek().Display();
-            ConsoleKeyInfo KeyPress; // Переменная, хранящая имя нажатой клавиши
-            do
-            { // Ждать нажатия клавиши, пока esc не нажата
-                KeyPress = Console.ReadKey();
-                switch (KeyPress.Key)
-                {
-                    case ConsoleKey.DownArrow: // Отслеживание нажатия "вниз"
-                        if (screens.Peek().Mode == Screen.FMode.Directory)
-                        {
-                            screens.Peek().CurrentItem++;
-                            screens.Peek().Display();
-                        }
-                        break;
-                    case ConsoleKey.UpArrow: // "вверх"
-                        if (screens.Peek().Mode == Screen.FMode.Directory)
-                        {
-                            screens.Peek().CurrentItem--;
-                            screens.Peek().Display();
-                        }
-                        break;
-                    case ConsoleKey.Enter: // "Enter"
-                        OpenItem(screens.Peek().Content[screens.Peek().CurrentItem], screens);
-                        break;
-                    case ConsoleKey.Backspace: // "BackSpace"
-                        BackTo(screens);
-                        break;
-                    case ConsoleKey.Delete: // "Del"
-                        DeleteItem(screens.Peek().Content[screens.Peek().CurrentItem], screens);
-                        break;
-                    case ConsoleKey.R: // "R"
-                        RenameItem(screens.Peek().Content[screens.Peek().CurrentItem], screens);
-                        break;
-                }
-            }
-            while (KeyPress.Key != ConsoleKey.Escape); // Если нажата esc - выход из консоли
+            string path = @"C:\Users\Faizullayev Rauan\Desktop\acmp";
+            FarManager FM = new FarManager(path);
+            FM.Start(); // Вызываем функцию
         }
     }
 }

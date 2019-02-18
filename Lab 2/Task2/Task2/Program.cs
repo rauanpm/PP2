@@ -25,7 +25,7 @@ namespace Task2
             for (int i = 0; i < s.Length / 2; i++)
             {
 
-                if (s[i] != s[s.Length - 1 - i])
+                if (s[i] != s[s.Length - 1 - i]) //сравниваем  первый элемент с последним и с помощью цикла движемся к середине
                 {
 
                     return false;
@@ -49,13 +49,13 @@ namespace Task2
                 if (IsPal(sr.ReadLine()))
                 {
 
-                    Console.WriteLine("Yes");
+                    Console.WriteLine("Yes"); // Вывводим Да если палиндром
 
                 }
                 else
                 {
 
-                    Console.WriteLine("No");
+                    Console.WriteLine("No"); // Выводим нет в противном случае
 
                 }
 
